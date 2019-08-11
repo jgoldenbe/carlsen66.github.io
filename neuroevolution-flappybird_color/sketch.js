@@ -38,17 +38,17 @@ let song;
 
 
 function preload() {
-  //song = loadSound('flower.mp3');
+  // song = loadSound('flower.mp3');
   cloudimg = loadImage("cloud.png");
   sunimg = loadImage('sun.png');
   birdimg = loadImage('bird.png');
- }
+}
 
 function setup() {
   let canvas = createCanvas(600, 400);
   canvas.parent('canvascontainer');
 
-  //song.play();
+  // song.play();
 
   // Access the interface elements
   speedSlider = select('#speedSlider');
@@ -89,14 +89,14 @@ function toggleState() {
 function SaveBestBird() {
   let json = {};
   json = bestBird.brain;
- 
+
   saveJSON(json, 'BridBrain.json')
 }
 
 function getdata(json) {
   let birdBrain = NeuralNetwork.deserialize(json);
   bestBird.brain = birdBrain;
-  
+
   runBest = true;
   resetGame();
   runBestButton.html('continue training');
@@ -108,13 +108,13 @@ function LoadBestBird() {
 
 
 function draw() {
-  background(40,30,220)
+  background(40, 30, 220)
 
   // Should we speed up cycles per frame
   let cycles = speedSlider.value();
   speedSpan.html(cycles);
 
-  image(sunimg, width-sunimg.width,10);
+  image(sunimg, width - sunimg.width, 10);
 
   // How many times to advance the game
   for (let n = 0; n < cycles; n++) {
@@ -218,7 +218,7 @@ function draw() {
   for (let i = 0; i < clouds.length; i++) {
     clouds[i].show();
   }
-  
+
   for (let i = 0; i < pipes.length; i++) {
     pipes[i].show();
   }
