@@ -1,12 +1,5 @@
-// Daniel Shiffman
-// Nature of Code: Intelligence and Learning
-// https://github.com/shiffman/NOC-S18
-
-// This flappy bird implementation is adapted from:
-// https://youtu.be/cXgA1d_E-jY&
-
 // How big is the population
-let totalPopulation = 500;
+let totalPopulation = 1;
 // All active birds (not yet collided with pipe)
 let activeBirds = [];
 // All birds for any given population
@@ -16,7 +9,12 @@ let pipes = [];
 // A frame counter to determine when to add a pipe
 let counter = 0;
 
-let clouds = [];
+let sky = [];
+let decor = [];
+let middle = [];
+let foreground = [];
+let ground = [];
+let player = [];
 
 // Interface elements
 let speedSlider;
@@ -31,207 +29,170 @@ let highScore = 0;
 let runBest = false;
 let runBestButton;
 let bestBird;
-let cloudimg;
-let sunimg;
 let bird;
-let song;
-
+let SkyImg;
+let BG_Decor;
+let Middle_Decor;
+let ForegroundImg;
+let GroundImg;
+let run;
+let runCreate;
+let run1;
+let run2;
+let run3;
+let run4;
+let run5;
+let run6;
+let run7;
+let run8;
 
 function preload() {
-  // song = loadSound('flower.mp3');
-  cloudimg = loadImage("cloud.png");
-  sunimg = loadImage('sun.png');
-  birdimg = loadImage('bird.png');
+   birdimg = loadImage('bird.png');
+   SkyImg = loadImage('img/bg/Sky.png');
+   BG_Decor = loadImage('img/bg/BG_Decor.png');
+   Middle_Decor = loadImage('img/bg/Middle_Decor.png');
+   ForegroundImg = loadImage('img/bg/Foreground.png');
+   GroundImg = loadImage('img/bg/Ground.png');
+
+   run = loadImage('img/run/run.gif');
+   runCreate = createImg('img/run/run.gif');
+   run1 = loadImage('img/run/1.png');
+   run2 = loadImage('img/run/2.png');
+   run3 = loadImage('img/run/3.png');
+   run4 = loadImage('img/run/4.png');
+   run5 = loadImage('img/run/5.png');
+   run6 = loadImage('img/run/6.png');
+   run7 = loadImage('img/run/7.png');
+   run8 = loadImage('img/run/8.png');
 }
 
 function setup() {
-  let canvas = createCanvas(600, 400);
-  canvas.parent('canvascontainer');
+   let canvas = createCanvas(1280, 720);
 
-  // song.play();
-
-  // Access the interface elements
-  speedSlider = select('#speedSlider');
-  speedSpan = select('#speed');
-  highScoreSpan = select('#hs');
-  allTimeHighScoreSpan = select('#ahs');
-  runBestButton = select('#best');
-  runBestButton.mousePressed(toggleState);
-  SaveButton = select('#save');
-  SaveButton.mousePressed(SaveBestBird);
-  LoadButton = select('#load');
-  LoadButton.mousePressed(LoadBestBird);
-
-
-
-  // Create a population
-  for (let i = 0; i < totalPopulation; i++) {
-    let bird = new Bird();
-    activeBirds[i] = bird;
-    allBirds[i] = bird;
-  }
+   // Create a population
+   for (let i = 0; i < totalPopulation; i++) {
+      let bird = new Bird();
+      activeBirds[i] = bird;
+      allBirds[i] = bird;
+   }
 }
-
-// Toggle the state of the simulation
-function toggleState() {
-  runBest = !runBest;
-  // Show the best bird
-  if (runBest) {
-    resetGame();
-    runBestButton.html('continue training');
-    // Go train some more
-  } else {
-    nextGeneration();
-    runBestButton.html('run best');
-  }
-}
-
-function SaveBestBird() {
-  let json = {};
-  json = bestBird.brain;
-
-  saveJSON(json, 'BridBrain.json')
-}
-
-function getdata(json) {
-  let birdBrain = NeuralNetwork.deserialize(json);
-  bestBird.brain = birdBrain;
-
-  runBest = true;
-  resetGame();
-  runBestButton.html('continue training');
-}
-
-function LoadBestBird() {
-  loadJSON('BridBrain.json', getdata);
-}
-
 
 function draw() {
-  background(40, 30, 220)
-
-  // Should we speed up cycles per frame
-  let cycles = speedSlider.value();
-  speedSpan.html(cycles);
-
-  image(sunimg, width - sunimg.width, 10);
-
-  // How many times to advance the game
-  for (let n = 0; n < cycles; n++) {
-    // Show all the pipes
-    for (let i = pipes.length - 1; i >= 0; i--) {
-      pipes[i].update();
-      if (pipes[i].offscreen()) {
-        pipes.splice(i, 1);
-      }
-    }
-    // Show all the cloud
-    for (let i = clouds.length - 1; i >= 0; i--) {
-      clouds[i].update();
-      if (clouds[i].offscreen()) {
-        clouds.splice(i, 1);
-      }
-    }
-    // Are we just running the best bird
-    if (runBest) {
-      bestBird.think(pipes);
-      bestBird.update();
-      for (let j = 0; j < pipes.length; j++) {
-        // Start over, bird hit pipe
-        if (pipes[j].hits(bestBird)) {
-          resetGame();
-          break;
-        }
+   // How many times to advance the game
+   for (let n = 0; n < 1; n++) {
+      // Show all the pipes
+      for (let i = pipes.length - 1; i >= 0; i--) {
+         pipes[i].update();
+         if (pipes[i].offscreen()) {
+            pipes.splice(i, 1);
+         }
       }
 
-      if (bestBird.bottomTop()) {
-        resetGame();
+      // Show Background
+      for (let i = sky.length - 1; i >= 0; i--) {
+         sky[i].update();
+         if (sky[i].offscreen()) {
+            sky.splice(i, 1);
+         }
       }
-      // Or are we running all the active birds
-    } else {
-      for (let i = activeBirds.length - 1; i >= 0; i--) {
-        let bird = activeBirds[i];
-        // Bird uses its brain!
-        bird.think(pipes);
-        bird.update();
 
-        // Check all the pipes
-        for (let j = 0; j < pipes.length; j++) {
-          // It's hit a pipe
-          if (pipes[j].hits(activeBirds[i])) {
-            // Remove this bird
-            activeBirds.splice(i, 1);
-            break;
-          }
-        }
-
-        if (bird.bottomTop()) {
-          activeBirds.splice(i, 1);
-        }
-
+      for (let i = decor.length - 1; i >= 0; i--) {
+         decor[i].update();
+         if (decor[i].offscreen()) {
+            decor.splice(i, 1);
+         }
       }
-    }
 
-    // Add a new pipe every so often
-    if (counter % 75 == 0) {
-      pipes.push(new Pipe());
-    }
-
-    if (counter % 95 == 0) {
-      clouds.push(new Cloud());
-    }
-    counter++;
-  }
-
-  // What is highest score of the current population
-  let tempHighScore = 0;
-  // If we're training
-  if (!runBest) {
-    // Which is the best bird?
-    let tempBestBird = null;
-    for (let i = 0; i < activeBirds.length; i++) {
-      let s = activeBirds[i].score;
-      if (s > tempHighScore) {
-        tempHighScore = s;
-        tempBestBird = activeBirds[i];
+      for (let i = middle.length - 1; i >= 0; i--) {
+         middle[i].update();
+         if (middle[i].offscreen()) {
+            middle.splice(i, 1);
+         }
       }
-    }
 
-    // Is it the all time high scorer?
-    if (tempHighScore > highScore) {
-      highScore = tempHighScore;
-      bestBird = tempBestBird;
-    }
-  } else {
-    // Just one bird, the best one so far
-    tempHighScore = bestBird.score;
-    if (tempHighScore > highScore) {
-      highScore = tempHighScore;
-    }
-  }
+      for (let i = foreground.length - 1; i >= 0; i--) {
+         foreground[i].update();
+         if (foreground[i].offscreen()) {
+            foreground.splice(i, 1);
+         }
+      }
 
-  // Update DOM Elements
-  highScoreSpan.html(tempHighScore);
-  allTimeHighScoreSpan.html(highScore);
+      for (let i = ground.length - 1; i >= 0; i--) {
+         ground[i].update();
+         if (ground[i].offscreen()) {
+            ground.splice(i, 1);
+         }
+      }
 
-  // Draw everything!
-  for (let i = 0; i < clouds.length; i++) {
-    clouds[i].show();
-  }
+      //Add a new pipe every so often
+      if (counter % 75 == 0) {
+         pipes.push(new Pipe());
+      }
 
-  for (let i = 0; i < pipes.length; i++) {
-    pipes[i].show();
-  }
+      if (counter % (width / 2) == 0) {
+         sky.push(new Sky());
+      }
 
-  if (runBest) {
-    bestBird.show();
-  } else {
-    for (let i = 0; i < activeBirds.length; i++) {
-      activeBirds[i].show();
-    }
-    // If we're out of birds go to the next generation
-    if (activeBirds.length == 0) {
-      nextGeneration();
-    }
-  }
+      if (counter % 854 == 0) {
+         decor.push(new Decor());
+      }
+
+      if (counter % 640 == 0) {
+         middle.push(new Middle());
+      }
+
+      if (counter % 1000 == 0) {
+         player.push(new Player());
+      }
+
+      if (counter % 512 == 0) {
+         foreground.push(new Foreground());
+      }
+
+      if (counter % 284 == 0) {
+         ground.push(new Ground());
+      }
+
+      counter++;
+   }
+
+   // Draw everything!
+   for (let i = 0; i < sky.length; i++) {
+      sky[i].showOnce();
+      sky[i].show();
+   }
+
+   for (let i = 0; i < decor.length; i++) {
+      decor[i].showOnce();
+      decor[i].show();
+   }
+
+   for (let i = 0; i < middle.length; i++) {
+      middle[i].showOnce();
+      middle[i].show();
+   }
+
+   for (let i = 0; i < foreground.length; i++) {
+      foreground[i].showOnce();
+      foreground[i].show();
+   }
+
+   image(run, 450, 450, 250, 270);
+
+   for (let i = 0; i < pipes.length; i++) {
+      pipes[i].show();
+   }
+
+   if (runBest) {
+      bestBird.show();
+   } else {
+      for (let i = 0; i < activeBirds.length; i++) {
+         activeBirds[i].show();
+      }
+   }
+
+   for (let i = 0; i < ground.length; i++) {
+      ground[i].showOnce();
+      ground[i].show();
+   }
 }
